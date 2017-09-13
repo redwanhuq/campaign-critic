@@ -87,6 +87,9 @@ ENV/
 # Rope project settings
 .ropeproject
 
+# Ignored files
+postgresql_uploader.ipynb
+
 # =========================
 # Operating System Files
 # =========================
