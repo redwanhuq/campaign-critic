@@ -69,27 +69,40 @@ def normalize(text):
         normalized
     )
     
-    return normalized
+    # Tag money amounts
+    normalized = re.sub(r'\$\d+(\.\d+)?', 'dollramt', normalized)
+    
+    # Tag percentages
+    normalized = re.sub(r'\d+(\.\d+)?\%', 'percntg', normalized)
+    
+    # Tag phone numbers
+    normalized = re.sub(
+        r'\b(\+\d{1,2}\s)?\d?[\-(.]?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b',
+        'phonenumbr',
+        normalized
+    )
+    
+    # Tag plain numbers
+    return re.sub(r'\d+(\.\d+)?', 'numbr', normalized)
 
 def get_sentences(text):
-    # Tokenizes text into sentences and returns them in a list
+    # Tokenize text into sentences and returns them in a list
     return nltk.sent_tokenize(text)
 
 def remove_punc(text):
-    # Returns the text with punctuation removed
-    return re.sub(r'[^\w\d\s]', ' ', text)
+    # Return the text with punctuation removed
+    return re.sub(r'[^\w\d\s]|\_', ' ', text)
 
 def get_words(text):
-    # Tokenizes text into words and returns them in a list, excluding tags
-    return [word for word in nltk.word_tokenize(remove_punc(text)) \
-            if word not in ('emailaddr', 'httpaddr')]
+    # Tokenize text into words and returns them in a list, excluding tags
+    return [word for word in nltk.word_tokenize(remove_punc(text))]
 
 def identify_allcaps(text):
-    # Counts the number of all-caps words
+    # Count the number of all-caps words
     return re.findall(r'\b[A-Z]{2,}', text)
 
 def count_exclamations(text):
-    # Counts the number of exclamation marks present in the text
+    # Count the number of exclamation marks present in the text
     return text.count('!')
 
 def count_apple_words(text):
@@ -99,9 +112,8 @@ def count_apple_words(text):
         'gorgeous', 'amazing', 'incredible', 'awesome']
     )
     
-    return sum(
-        1 for word in get_words(text) if word in apple_words
-    )
+    # Count total Apple adjectives in text
+    return sum(1 for word in get_words(text) if word in apple_words)
 
 def compute_avg_words(text):
     # Compute the mean number of words in each sentence
@@ -275,7 +287,24 @@ def count_bolded(soup, section):
             class_='mb3 mb10-sm mb3 js-risks'
             ).find_all('b'))
 
-def extract_features(soup, campaign, section):
+def preprocess_text(text):
+    # Access stop word dictionary
+    stop_words = set(nltk.corpus.stopwords.words('english'))
+
+    # Prepare the Porter stemmer
+    porter = nltk.PorterStemmer()
+    
+    # Remove punctuation and lowercase each word
+    text = remove_punc(text).lower()
+    
+    # Remove stop words and stem each word
+    return ' '.join(
+        porter.stem(term )
+        for term in text.split()
+        if term not in set(stop_words)
+    )
+
+def extract_meta_features(soup, campaign, section):
     # Count the number of words in the section
     num_words = len(get_words(campaign[section]))
     
@@ -317,6 +346,10 @@ def process_project(hyperlink):
     scraped_html = scrape(hyperlink)
     soup = parse(scraped_html)
     campaign = get_campaign(soup)
+    
     campaign['about'] = normalize(campaign['about'])
-    campaign['risks'] = normalize(campaign['risks'])
-    return extract_features(soup, campaign, 'about')
+    #campaign['risks'] = normalize(campaign['risks'])
+
+    meta_features = extract_meta_features(soup, campaign, 'about')
+    preprocessed_text = preprocess_text(campaign['about'])
+    return meta_features, preprocessed_text
