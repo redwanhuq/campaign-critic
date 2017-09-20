@@ -6,7 +6,6 @@ import re
 import lxml
 import pandas as pd
 import numpy as np
-from sklearn.externals import joblib
 
 def scrape(hyperlink):
     # Scrape the website
@@ -341,15 +340,17 @@ def extract_meta_features(soup, campaign, section):
     )
 
 def process_project(hyperlink):
-    # Scrape HTML content from hyperlink, parse it, collect campaign section 1,
-    # normalize text, extract features, and return a feature vector
+    # Scrape HTML content from hyperlink and  parse it
     scraped_html = scrape(hyperlink)
     soup = parse(scraped_html)
-    campaign = get_campaign(soup)
-    
-    campaign['about'] = normalize(campaign['about'])
-    #campaign['risks'] = normalize(campaign['risks'])
 
+    # Collect campaign and normalize text in the 'About this project section'
+    campaign = get_campaign(soup)
+    campaign['about'] = normalize(campaign['about'])
+    
+    # Extract meta features
     meta_features = extract_meta_features(soup, campaign, 'about')
+
+    # Preprocess text in the campaign section
     preprocessed_text = preprocess_text(campaign['about'])
     return meta_features, preprocessed_text
