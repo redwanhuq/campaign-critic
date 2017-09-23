@@ -12,7 +12,7 @@ def scrape(hyperlink):
     return requests.get(hyperlink)
 
 def parse(scraped_html):
-    # Parse the HTML content
+    # Parse the HTML content using an lxml parser
     return BeautifulSoup(scraped_html.text, 'lxml')
 
 def clean_up(messy_text):    
@@ -38,7 +38,8 @@ def get_campaign(soup):
     except AttributeError:
         section1 = 'section_not_found'
     
-    # Collect the 'Risks and challenges' section if available
+    # Collect the "Risks and challenges" section if available, and remove #
+    # unnecessary text
     try:
         section2 = soup.find(
             'div', 
@@ -85,7 +86,7 @@ def normalize(text):
     return re.sub(r'\d+(\.\d+)?', 'numbr', normalized)
 
 def get_sentences(text):
-    # Tokenize text into sentences and returns them in a list
+    # Tokenize text into sentences and return them in a list
     return nltk.sent_tokenize(text)
 
 def remove_punc(text):
@@ -93,7 +94,7 @@ def remove_punc(text):
     return re.sub(r'[^\w\d\s]|\_', ' ', text)
 
 def get_words(text):
-    # Tokenize text into words and returns them in a list, excluding tags
+    # Tokenize text into words and return them in a list
     return [word for word in nltk.word_tokenize(remove_punc(text))]
 
 def identify_allcaps(text):
@@ -111,11 +112,11 @@ def count_apple_words(text):
         'gorgeous', 'amazing', 'incredible', 'awesome']
     )
     
-    # Count total Apple adjectives in text
+    # Count total number of Apple adjectives in the text
     return sum(1 for word in get_words(text) if word in apple_words)
 
 def compute_avg_words(text):
-    # Compute the mean number of words in each sentence
+    # Compute the average number of words in each sentence
     return pd.Series(
         [len(get_words(sentence)) for sentence in \
          get_sentences(text)]
@@ -128,12 +129,12 @@ def count_paragraphs(soup, section):
             'div',
             class_='full-description js-full-description responsive' + \
                 '-media formatted-lists'
-            ).find_all('p'))
+        ).find_all('p'))
     elif section == 'risks':
         return len(soup.find(
             'div',
             class_='mb3 mb10-sm mb3 js-risks'
-            ).find_all('p'))
+        ).find_all('p'))
     
 def compute_avg_sents_paragraph(soup, section):
     # Use tree parsing to identify all paragraphs
@@ -142,14 +143,14 @@ def compute_avg_sents_paragraph(soup, section):
             'div',
             class_='full-description js-full-description responsive' + \
                 '-media formatted-lists'
-            ).find_all('p')
+        ).find_all('p')
     elif section == 'risks':
         paragraphs = soup.find(
             'div',
             class_='mb3 mb10-sm mb3 js-risks'
-            ).find_all('p')
+        ).find_all('p')
     
-    # Compute the mean number of sentences in each paragraph    
+    # Compute the average number of sentences in each paragraph    
     return pd.Series(
         [len(get_sentences(paragraph.get_text(' '))) for paragraph in \
          paragraphs]
@@ -162,14 +163,14 @@ def compute_avg_words_paragraph(soup, section):
             'div',
             class_='full-description js-full-description responsive' + \
                 '-media formatted-lists'
-            ).find_all('p')
+        ).find_all('p')
     elif section == 'risks':
         paragraphs = soup.find(
             'div',
             class_='mb3 mb10-sm mb3 js-risks'
-            ).find_all('p')
+        ).find_all('p')
     
-    # Compute the mean number of words in each paragraph
+    # Compute the average number of words in each paragraph
     return pd.Series(
         [len(get_words(paragraph.get_text(' '))) for paragraph in paragraphs]
     ).mean()
@@ -181,12 +182,12 @@ def count_images(soup, section):
             'div',
             class_='full-description js-full-description responsive' + \
                 '-media formatted-lists'
-            ).find_all('img'))
+        ).find_all('img'))
     elif section == 'risks':
         return len(soup.find(
             'div',
             class_='mb3 mb10-sm mb3 js-risks'
-            ).find_all('img'))
+        ).find_all('img'))
     
 def count_videos(soup, section):    
     # Use tree parsing to compute number of non-YouTube videos
@@ -195,12 +196,12 @@ def count_videos(soup, section):
             'div',
             class_='full-description js-full-description responsive' + \
                 '-media formatted-lists'
-            ).find_all('div', class_='video-player'))
+        ).find_all('div', class_='video-player'))
     elif section == 'risks':
         return len(soup.find(
             'div',
             class_='mb3 mb10-sm mb3 js-risks'
-            ).find_all('div', class_='video-player'))
+        ).find_all('div', class_='video-player'))
 
 def count_youtube(soup, section):    
     # Initialize total number of YouTube videos
@@ -219,7 +220,7 @@ def count_youtube(soup, section):
             class_='mb3 mb10-sm mb3 js-risks'
         ).find_all('iframe')
     
-    # Since YouTube videos are contained in iframe tags, determine which
+    # Since YouTube videos are contained only in iframe tags, determine which
     # iframe tags contain YouTube videos and count them
     for iframe in iframes:
         try:
@@ -250,6 +251,7 @@ def count_gifs(soup, section):
     # Since GIFs are contained in image tags, determine which image tags
     # contain GIFs and count them
     for image in images:
+        # Catch any iframes that fail to include an image source link
         try:
             if 'gif' in image.get('data-src'):
                 gif_count += 1
@@ -265,12 +267,12 @@ def count_hyperlinks(soup, section):
             'div',
             class_='full-description js-full-description responsive' + \
                 '-media formatted-lists'
-            ).find_all('a'))
+        ).find_all('a'))
     elif section == 'risks':
         return len(soup.find(
             'div',
             class_='mb3 mb10-sm mb3 js-risks'
-            ).find_all('a'))
+        ).find_all('a'))
     
 def count_bolded(soup, section):    
     # Use tree parsing to count number of bolded text
@@ -279,12 +281,12 @@ def count_bolded(soup, section):
             'div',
             class_='full-description js-full-description responsive' + \
                 '-media formatted-lists'
-            ).find_all('b'))
+        ).find_all('b'))
     elif section == 'risks':
         return len(soup.find(
             'div',
             class_='mb3 mb10-sm mb3 js-risks'
-            ).find_all('b'))
+        ).find_all('b'))
 
 def preprocess_text(text):
     # Access stop word dictionary
@@ -337,7 +339,7 @@ def extract_meta_features(soup, campaign, section):
             count_hyperlinks(soup, section),
             count_bolded(soup, section),
             count_bolded(soup, section) / num_words
-    )
+        )
 
 def process_project(hyperlink):
     # Scrape HTML content from hyperlink and  parse it

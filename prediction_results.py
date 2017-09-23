@@ -11,7 +11,7 @@ sns.set(font_scale=1.3)
 
 def construct_graph(scaled_meta_features, feature_ranks, top_project_std):
     
-    # List of meta features to use in models
+    # List of meta features
     features = ['num_sents', 'num_words', 'num_all_caps', 'percent_all_caps',
                 'num_exclms', 'percent_exclms', 'num_apple_words',
                 'percent_apple_words', 'avg_words_per_sent', 'num_paragraphs',
@@ -23,7 +23,7 @@ def construct_graph(scaled_meta_features, feature_ranks, top_project_std):
     predictive_features = ['num_hyperlinks', 'num_images', 'num_apple_words',
                      'num_exclms', 'percent_bolded', 'num_words']
 
-    # Prepare the feature vector
+    # Transform the scaled meta features as a Series
     feature_vector_std = pd.Series(scaled_meta_features.ravel(), index=features)
 
     # Compute the strength of the meta features of the user's project
@@ -38,7 +38,7 @@ def construct_graph(scaled_meta_features, feature_ranks, top_project_std):
         feature_ranks[predictive_features]
     )
 
-    # Combine the strength metrics into one DataFrame
+    # Combine the strength metrics into a single DataFrame
     messy = pd.DataFrame(
         [user_project_strength, top_project_strength], 
         index=['My project', 'Top 5%']
