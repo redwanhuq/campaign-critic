@@ -51,7 +51,7 @@ def construct_graph(scaled_meta_features, feature_ranks, top_project_std):
         var_name=' '
     )
 
-    # Draw a grouped bar plot
+    # Draw a grouped bar plot and remove axes labels and x-axis tick marks
     fig = sns.factorplot(
         data=tidy,
         y='index',

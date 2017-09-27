@@ -314,8 +314,8 @@ def extract_meta_features(soup, campaign, section):
     if num_words == 0:
         num_words = np.nan
         
-    # Extract all features for the given section. If the section isn't 
-    # available, then return np.nan for each feature.
+    # Extract all meta features for the given section. If the section isn't 
+    # available, then return np.nan for each meta feature.
     if campaign[section] == 'section_not_found':
         return([np.nan] * 19)
     else:
