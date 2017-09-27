@@ -38,7 +38,7 @@ def get_campaign(soup):
     except AttributeError:
         section1 = 'section_not_found'
     
-    # Collect the "Risks and challenges" section if available, and remove #
+    # Collect the "Risks and challenges" section if available, and remove all
     # unnecessary text
     try:
         section2 = soup.find(
@@ -51,7 +51,7 @@ def get_campaign(soup):
     except AttributeError:
         section2 = 'section_not_found'
     
-    # Clean both sections and return them in a dict
+    # Clean both sections and return them in a dictionary
     return {'about': clean_up(section1), 'risks': clean_up(section2)}
 
 def normalize(text):
@@ -90,7 +90,7 @@ def get_sentences(text):
     return nltk.sent_tokenize(text)
 
 def remove_punc(text):
-    # Return the text with punctuation removed
+    # Return text with punctuation removed
     return re.sub(r'[^\w\d\s]|\_', ' ', text)
 
 def get_words(text):

@@ -10,7 +10,6 @@ sns.set(context='notebook', style='darkgrid')
 sns.set(font_scale=1.3)
 
 def construct_graph(scaled_meta_features, feature_ranks, top_project_std):
-    
     # List of meta features
     features = ['num_sents', 'num_words', 'num_all_caps', 'percent_all_caps',
                 'num_exclms', 'percent_exclms', 'num_apple_words',
@@ -23,7 +22,7 @@ def construct_graph(scaled_meta_features, feature_ranks, top_project_std):
     predictive_features = ['num_hyperlinks', 'num_images', 'num_apple_words',
                      'num_exclms', 'percent_bolded', 'num_words']
 
-    # Transform the scaled meta features as a Series
+    # Transform the scaled meta features into a Series
     feature_vector_std = pd.Series(scaled_meta_features.ravel(), index=features)
 
     # Compute the strength of the meta features of the user's project
@@ -67,6 +66,7 @@ def construct_graph(scaled_meta_features, feature_ranks, top_project_std):
     # Re-label the y-axis
     labels = ['# of hyperlinks', '# of images', '# of innovation words',
               '# of exclamation marks', '% of text bolded', '# of words']
-    
     plt.yticks(np.arange(6), labels)
-    plt.savefig('data/figure.png')
+
+    # Save the figure
+    plt.savefig('data/figure.png', bbox_inches='tight');
