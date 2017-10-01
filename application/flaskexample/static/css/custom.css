@@ -1,0 +1,115 @@
+@import url("https://fonts.googleapis.com/css?family=Lobster:400");
+@import url("https://fonts.googleapis.com/css?family=Raleway:400,400i,700,700i");
+
+.navbar-brand {
+  font-size: 20px;
+}
+
+body {
+  padding-top: 25px;
+  width: 90%;
+  margin: auto;
+  color: #333333;
+  font-family: "Raleway";
+}
+
+input[type="text"] {
+	width: 90%;
+    height: 36px;
+    border-width: 2px;
+    outline: none;
+    color: #20C863;
+    font-size: 16px;
+    border-radius: 4px;
+}
+
+/* page title */
+h1 {
+	font-size: 41px;
+	font-family: "Lobster"; 
+	color: #20C863;
+	
+}
+
+img {
+    display: block;
+    margin: auto;
+    width: 90%;
+}
+
+p, li {
+	font-size: 20px;
+	font-family: "Raleway";
+	color: #333333;
+}
+
+/* probability report */
+h2 {
+    font-size: 54px;
+    font-family: "Raleway";
+    color: #333333;
+    font-weight: bold;
+}
+
+/* project title */
+h3 {
+    font-size: 28px;
+    font-family: "Raleway";
+    font-weight: bold;
+    color: #333333;
+}
+
+
+h4 {
+    font-size: 16px;
+    font-family: "Raleway";
+    color: #333333;
+}
+
+/* section titles */
+h5 {
+    font-size: 41px;
+    font-family: "Lobster";  
+    color: #20C863;
+}
+
+nav {
+    font-family: "Lobster";
+}
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1.5px solid #333333;
+    margin: 1em 0;
+    padding: 0;
+}
+
+h6 {
+    font-size: 20px;
+    font-family: "Raleway";
+    color: #333333;
+}
+
+.button {
+    border-radius: 6px;
+    background-color: #20C863;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    font-family: "Lobster";
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 24px;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+    outline: none;
+}
+
+.button:hover {
+    background-color: #149C4E; 
+    color: white;
+}

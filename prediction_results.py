@@ -1,4 +1,4 @@
-# Load required packages
+# Load required libraries
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.externals import joblib
@@ -7,9 +7,26 @@ import numpy as np
 
 # Set figure display options
 sns.set(context='notebook', style='darkgrid')
-sns.set(font_scale=1.3)
+sns.set(font_scale=1.4)
 
 def construct_graph(scaled_meta_features, feature_ranks, top_project_std):
+    """Constructs and saves a plot displaying the weighted scores of the user's
+    project compared to the weighted scores of the average project from the top
+    5% of projects
+    
+    Args:
+        scaled_meta_features (ndarray): a NumPy array containing the values of the
+            19 meta features standardized by the scaler trained on the training
+            set
+        feature_ranks (ndarray): a NumPy array containing the weights of the 
+            trained model
+        top_project_std (ndarray): a NumPy array containing the values of the 19
+            features from the average project from the top 5%, standardized by the
+            scaler trained on the training set
+    
+    Returns:
+        Nothing"""
+
     # List of meta features
     features = ['num_sents', 'num_words', 'num_all_caps', 'percent_all_caps',
                 'num_exclms', 'percent_exclms', 'num_apple_words',
@@ -25,33 +42,34 @@ def construct_graph(scaled_meta_features, feature_ranks, top_project_std):
     # Transform the scaled meta features into a Series
     feature_vector_std = pd.Series(scaled_meta_features.ravel(), index=features)
 
-    # Compute the strength of the meta features of the user's project
-    user_project_strength = np.multiply(
+    # Compute the weighted score of the meta features of the user's project
+    user_project_score = np.multiply(
         feature_vector_std[predictive_features],
         feature_ranks[predictive_features]
     )
 
-    # Compute the strength of the meta features of the average top project
-    top_project_strength = np.multiply(
+    # Compute the weighted score of the meta features of the average top project
+    top_project_score = np.multiply(
         top_project_std[predictive_features],
         feature_ranks[predictive_features]
     )
 
-    # Combine the strength metrics into a single DataFrame
+    # Combine the weighted score into a single DataFrame
     messy = pd.DataFrame(
-        [user_project_strength, top_project_strength], 
-        index=['My project', 'Top 5%']
+        [user_project_score, top_project_score], 
+        index=['Your project', 'Top 5%']
     ).T.reset_index()
 
     # Transform the combined data into tidy format
     tidy = pd.melt(
         messy,
         id_vars='index',
-        value_vars=['My project', 'Top 5%'],
+        value_vars=['Your project', 'Top 5%'],
         var_name=' '
     )
 
-    # Draw a grouped bar plot and remove axes labels and x-axis tick marks
+    # Draw a grouped bar plot of the weighted scores, and remove axes labels and 
+    # x-axis tick marks
     fig = sns.factorplot(
         data=tidy,
         y='index',
@@ -61,12 +79,17 @@ def construct_graph(scaled_meta_features, feature_ranks, top_project_std):
         size=5,
         aspect=1.5,
         palette='Set2'
-    ).set(xlabel='relative strength', ylabel='');
+    ).set(
+        xlabel='score',
+        ylabel='',
+        xticks=[]
+    )
 
-    # Re-label the y-axis
-    labels = ['# of hyperlinks', '# of images', '# of innovation words',
-              '# of exclamation marks', '% of text bolded', '# of words']
+    # Re-label the y-axis and re-position legend
+    labels = ['hyperlinks', 'images', 'innovation words', 'exclamation marks',
+        'bolded text', 'length of description']
     plt.yticks(np.arange(6), labels)
+    fig.ax.legend(loc='lower right')
 
     # Save the figure
-    plt.savefig('data/figure.png', bbox_inches='tight');
+    plt.savefig('data/figure.png', bbox_inches='tight', dpi=300);

@@ -8,14 +8,41 @@ import pandas as pd
 import numpy as np
 
 def scrape(hyperlink):
+    """Use the Requests library to scrape a Kickstarter project page
+    
+    Args:
+        hyperlink (str): URL of the Kickstarter page to scrape
+    
+    Returns:
+        a response object containing the scraped content"""
+
     # Scrape the website
     return requests.get(hyperlink)
 
 def parse(scraped_html):
+    """Use the BeautifulSoup library to parse the scraped HTML of a project 
+    using an lxml parser
+    
+    Args:
+        scraped_html (response object): the unparsed response object collected
+        by the web scraper
+    
+    Returns:
+        a soup object containing the parsed HTML"""
+
     # Parse the HTML content using an lxml parser
     return BeautifulSoup(scraped_html.text, 'lxml')
 
 def clean_up(messy_text):    
+    """Clean up the text of a campaign section by removing unnecessary and
+    extraneous content
+    
+    Args:
+        messy_text (str): the raw text from a campaign section
+    
+    Returns:
+        a string containing the cleaned text"""
+
     # Remove line breaks, leading and trailing whitespace, and compress all
     # whitespace to a single space
     clean_text = ' '.join(messy_text.split()).strip()
@@ -28,6 +55,15 @@ def clean_up(messy_text):
     )
 
 def get_campaign(soup):
+    """Extract the two campaign sections, "About this project" and "Risk and
+    challenges", of a Kickstarter project
+    
+    Args:
+        soup (soup object): parsed HTML content of a Kickstarter project page
+    
+    Returns:
+        a dictionary of 2 strings containing each campaign section"""
+
     # Collect the 'About this project' section if available
     try:
         section1 = soup.find(
@@ -55,67 +91,142 @@ def get_campaign(soup):
     return {'about': clean_up(section1), 'risks': clean_up(section2)}
 
 def normalize(text):
-    # Tag email addresses
+    """Tag meta content inside a campaign section, such as email addresses,
+    hyperlinks, money amounts, percentages, phone numbers, and numbers, to
+    avoid adding these into the word count
+    
+    Args:
+        text (str): cleaned text of a campaign section
+    
+    Returns:
+        a string containing the text of a campaign section with all the meta
+        content tagged"""
+
+    # Tag email addresses with regex
     normalized = re.sub(
         r'\b[\w\-.]+?@\w+?\.\w{2,4}\b',
         'emailaddr',
         text
     )
     
-    # Tag hyperlinks
+    # Tag hyperlinks with regex
     normalized = re.sub(
         r'(http[s]?\S+)|(\w+\.[A-Za-z]{2,4}\S*)',
         'httpaddr',
         normalized
     )
     
-    # Tag money amounts
+    # Tag money amounts with regex
     normalized = re.sub(r'\$\d+(\.\d+)?', 'dollramt', normalized)
     
-    # Tag percentages
+    # Tag percentages with regex
     normalized = re.sub(r'\d+(\.\d+)?\%', 'percntg', normalized)
     
-    # Tag phone numbers
+    # Tag phone numbers with regex
     normalized = re.sub(
         r'\b(\+\d{1,2}\s)?\d?[\-(.]?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b',
         'phonenumbr',
         normalized
     )
     
-    # Tag plain numbers
+    # Tag plain numbers with regex
     return re.sub(r'\d+(\.\d+)?', 'numbr', normalized)
 
 def get_sentences(text):
-    # Tokenize text into sentences and return them in a list
+    """Use the sentence tokenizer from the nltk library to extract sentences 
+    from the text of a campaign section
+    
+    Args:
+        text (str): cleaned and normalized text of a campaign section
+    
+    Returns:
+        a list containing every sentence of a campaign section"""
+
+    # Tokenize text into sentences
     return nltk.sent_tokenize(text)
 
 def remove_punc(text):
-    # Return text with punctuation removed
+    """Remove all punctuation from the text of a campaign section
+    
+    Args:
+        text (str): cleaned and normalized text of a campaign section
+    
+    Returns:
+        a string containing the text of a campaign section without any
+        punctuation"""
+
+    # Remove punctuation with regex
     return re.sub(r'[^\w\d\s]|\_', ' ', text)
 
 def get_words(text):
-    # Tokenize text into words and return them in a list
+    """Use the word tokenizer from the nltk library to extract words from the 
+    text of a campaign section
+    
+    Args:
+        text (str): cleaned and normalized text of a campaign section
+    
+    Returns:
+        a list containing every word of a campaign section"""
+
+    # Remove punctuation and then tokenize the text into words
     return [word for word in nltk.word_tokenize(remove_punc(text))]
 
 def identify_allcaps(text):
-    # Count the number of all-caps words
+    """Find all examples where a word is written in all capital letters in the 
+    text of a campaign section
+    
+    Args:
+        text (str): cleaned and normalized text of a campaign section
+    
+    Returns:
+        a list containing every all-caps word of a campaign section"""
+
+    # Identify all-caps words with regex
     return re.findall(r'\b[A-Z]{2,}', text)
 
 def count_exclamations(text):
+    """Count the number of exclamation marks in the text of a campaign section
+    
+    Args:
+        text (str): cleaned and normalized text of a campaign section
+    
+    Returns:
+        an integer representing the number of exclamation marks in the text"""
+
     # Count the number of exclamation marks present in the text
     return text.count('!')
 
 def count_apple_words(text):
-    # Define a set of Apple adjectives
+    """Count the number of innovation-related words (called Apple words) in the
+    text of a campaign section
+    
+    Args:
+        text (str): cleaned and normalized text of a campaign section
+    
+    Returns:
+        an integer representing the number of Apple words in the text"""
+
+    # Define a set of adjectives used commonly by Apple marketing team
+    # according to https://www.youtube.com/watch?v=ZWPqjXYTqYw
     apple_words = frozenset(
         ['revolutionary', 'breakthrough', 'beautiful', 'magical', 
         'gorgeous', 'amazing', 'incredible', 'awesome']
     )
     
-    # Count total number of Apple adjectives in the text
+    # Count total number of Apple words in the text
     return sum(1 for word in get_words(text) if word in apple_words)
 
 def compute_avg_words(text):
+    """Count the average number of words in each sentence in the text of a 
+    campaign section
+    
+    Args:
+        text (str): cleaned and normalized text of a campaign section
+    
+    Returns:
+        a float representing the average number of words in each sentence of
+        the text"""
+
     # Compute the average number of words in each sentence
     return pd.Series(
         [len(get_words(sentence)) for sentence in \
@@ -123,7 +234,18 @@ def compute_avg_words(text):
     ).mean()
 
 def count_paragraphs(soup, section):    
-    # Use tree parsing to compute number of paragraphs
+    """Count the number of paragraph tags in a campaign section
+    
+    Args:
+        soup (soup object): parsed HTML content of a Kickstarter project page
+        section (str): label of the campaign section to be analyzed
+    
+    Returns:
+        an integer representing the number of paragraphs in the campaign
+        section"""
+
+    # Use tree parsing to count the number of paragraphs depending on which
+    # section is requested
     if section == 'about':
         return len(soup.find(
             'div',
@@ -137,7 +259,19 @@ def count_paragraphs(soup, section):
         ).find_all('p'))
     
 def compute_avg_sents_paragraph(soup, section):
-    # Use tree parsing to identify all paragraphs
+    """Count the average number of sentences per paragraph in a campaign 
+    section
+    
+    Args:
+        soup (soup object): parsed HTML content of a Kickstarter project page
+        section (str): label of the campaign section to be analyzed
+    
+    Returns:
+        a float representing the average number of sentences in each paragraph
+        of a campaign section"""
+
+    # Use tree parsing to identify all paragraphs depending on which section
+    # is requested
     if section == 'about':
         paragraphs = soup.find(
             'div',
@@ -157,7 +291,18 @@ def compute_avg_sents_paragraph(soup, section):
     ).mean()
 
 def compute_avg_words_paragraph(soup, section):
-    # Use tree parsing to identify all paragraphs
+    """Count the average number of words per paragraph in a campaign section
+    
+    Args:
+        soup (soup object): parsed HTML content of a Kickstarter project page
+        section (str): label of the campaign section to be analyzed
+    
+    Returns:
+        a float representing the average number of words in each paragraph
+        of a campaign section"""
+
+    # Use tree parsing to identify all paragraphs depending on which section
+    # is requested
     if section == 'about':
         paragraphs = soup.find(
             'div',
@@ -176,7 +321,17 @@ def compute_avg_words_paragraph(soup, section):
     ).mean()
 
 def count_images(soup, section):    
-    # Use tree parsing to compute number of images
+    """Count the number of image tags in a campaign section
+    
+    Args:
+        soup (soup object): parsed HTML content of a Kickstarter project page
+        section (str): label of the campaign section to be analyzed
+    
+    Returns:
+        an integer representing the number of images in a campaign section"""
+    
+    # Use tree parsing to identify all image tags depending on which section
+    # is requested
     if section == 'about':
         return len(soup.find(
             'div',
@@ -190,7 +345,18 @@ def count_images(soup, section):
         ).find_all('img'))
     
 def count_videos(soup, section):    
-    # Use tree parsing to compute number of non-YouTube videos
+    """Count the number of non-YouTube videos in a campaign section
+    
+    Args:
+        soup (soup object): parsed HTML content of a Kickstarter project page
+        section (str): label of the campaign section to be analyzed
+    
+    Returns:
+        an integer representing the number of non-YouTube videos in a campaign
+        section"""
+
+    # Use tree parsing to count all non-YouTube video tags depending on which
+    # section is requested
     if section == 'about':
         return len(soup.find(
             'div',
@@ -204,10 +370,21 @@ def count_videos(soup, section):
         ).find_all('div', class_='video-player'))
 
 def count_youtube(soup, section):    
+    """Count the number of YouTube videos in a campaign section
+    
+    Args:
+        soup (soup object): parsed HTML content of a Kickstarter project page
+        section (str): label of the campaign section to be analyzed
+    
+    Returns:
+        an integer representing the number of YouTube videos in a campaign
+        section"""
+
     # Initialize total number of YouTube videos
     youtube_count = 0
 
-    # Use tree parsing to select all iframe tags
+    # Use tree parsing to identify all iframe tags depending on which section
+    # is requested
     if section == 'about':
         iframes = soup.find(
             'div',
@@ -223,6 +400,7 @@ def count_youtube(soup, section):
     # Since YouTube videos are contained only in iframe tags, determine which
     # iframe tags contain YouTube videos and count them
     for iframe in iframes:
+        # Catch any iframes that fail to include a YouTube source link
         try:
             if 'youtube' in iframe.get('src'):
                 youtube_count += 1
@@ -232,10 +410,21 @@ def count_youtube(soup, section):
     return youtube_count
 
 def count_gifs(soup, section):    
+    """Count the number of GIF images in a campaign section
+    
+    Args:
+        soup (soup object): parsed HTML content of a Kickstarter project page
+        section (str): label of the campaign section to be analyzed
+    
+    Returns:
+        an integer representing the number of GIF images in a campaign
+        section"""
+
     # Initialize total number of GIFs
     gif_count = 0
 
-    # Use tree parsing to select all image tags
+    # Use tree parsing to select all image tags depending on the section
+    # requested
     if section == 'about':
         images = soup.find(
             'div',
@@ -261,7 +450,18 @@ def count_gifs(soup, section):
     return gif_count
 
 def count_hyperlinks(soup, section):    
-    # Use tree parsing to count number of hyperlinks
+    """Count the number of hyperlink tags in a campaign section
+    
+    Args:
+        soup (soup object): parsed HTML content of a Kickstarter project page
+        section (str): label of the campaign section to be analyzed
+    
+    Returns:
+        an integer representing the number of hyperlinks in a campaign
+        section"""
+
+    # Use tree parsing to compute number of hyperlink tags depending on the
+    # section requested
     if section == 'about':
         return len(soup.find(
             'div',
@@ -275,7 +475,18 @@ def count_hyperlinks(soup, section):
         ).find_all('a'))
     
 def count_bolded(soup, section):    
-    # Use tree parsing to count number of bolded text
+    """Count the number of bold tags in a campaign section
+    
+    Args:
+        soup (soup object): parsed HTML content of a Kickstarter project page
+        section (str): label of the campaign section to be analyzed
+    
+    Returns:
+        an integer representing the number of bolded text tags in a campaign
+        section"""
+
+    # Use tree parsing to compute number of bolded text tags depending on which
+    # section is requested
     if section == 'about':
         return len(soup.find(
             'div',
@@ -289,6 +500,15 @@ def count_bolded(soup, section):
         ).find_all('b'))
 
 def preprocess_text(text):
+    """Perform text preprocessing such as removing punctuation, lowercasing all
+    words, removing stop words and stemming remaining words
+    
+    Args:
+        text (str): cleaned and normalized text of a campaign section
+    
+    Returns:
+        a string containing text that has been preprocessed"""
+
     # Access stop word dictionary
     stop_words = set(nltk.corpus.stopwords.words('english'))
 
@@ -306,16 +526,28 @@ def preprocess_text(text):
     )
 
 def extract_meta_features(soup, campaign, section):
+    """Extract the meta features of the text of campaign section
+    
+    Args:
+        soup (soup object): parsed HTML content of a Kickstarter project page
+        campaign (dict): dictionary of strings containing both campaign
+            sections
+        section (str): label of the campaign section to be analyzed
+    
+    Returns:
+        a tuple containing 19 extracted meta features, otherwise a list of 19
+        NaN values if the campaign section does not exist"""
+
     # Count the number of words in the section
     num_words = len(get_words(campaign[section]))
     
-    # If the section contains no words, assign NaN to num_words to avoid
+    # If the section contains no words, assign NaN to 'num_words' to avoid
     # potential division by zero
     if num_words == 0:
         num_words = np.nan
         
     # Extract all meta features for the given section. If the section isn't 
-    # available, then return np.nan for each meta feature.
+    # available, then return NaN for each meta feature.
     if campaign[section] == 'section_not_found':
         return([np.nan] * 19)
     else:
@@ -342,6 +574,15 @@ def extract_meta_features(soup, campaign, section):
         )
 
 def process_project(hyperlink):
+    """Extract the meta features and preprocessed text of a Kickstarter project
+    
+    Args:
+        hyperlink (str): URL of the Kickstarter page to scrape
+    
+    Returns:
+        a tuple containing extracted meta features and a string containing
+        the preprocessed text of the campaign section"""
+
     # Scrape HTML content from hyperlink and  parse it
     scraped_html = scrape(hyperlink)
     soup = parse(scraped_html)
