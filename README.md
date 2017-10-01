@@ -1,2 +1,2 @@
-# Campaign Critic
-An on-going project being completed at Insight Data Science
+# CampaignCritic
+![Landing page](landing_page.PNG)
