@@ -26,16 +26,19 @@ For those still curious about how I built CampaignCritic, check out these [slide
 - I love natural language processing and want to use it to build tools that enable machines to decode and interpret the most unstructured data of all&mdash;human language. By doing so, perhaps we'll someday teach a machine to design Kickstarter campaigns, or even business plans for new companies as well.
 
 ## What does this repo include?
-- Jupyter notebooks that illustrate every aspect of building this project with complete documentation. Each notebook can be run to generate data and content needed for the subsquent notebook.
-   0. Extracting Kickstarter URLs from the Web Robots database
-   1. Building a web scraper to build a dataset of Kickstarter projects
-   2. Performing feature engineering on the Kickstarter dataset
-   3. Uploading the complete training set into a PostgreSQL database
-   4. Visually exploring meta features and their correlations with one another and class
-   5. Training a validated machine learning model on meta features and n-grams
-   6. Building a bar graph that identifies how effectively a project utilized key structural components that were most predictive of funded projects
-- Jupyter notebooks used for prototyping (found in the [prototyping](https://github.com/redwanhuq/campaign-critic/tree/master/prototyping) folder and fully documented) the following:
-   1. Designing an efficient web scraper to collect Kickstarter projects
-   2. Constructing a feature engineering strategy for meta features
-   3. Researching, testing and validating machine learning models
-- Web app based on Bootstrap (frontend) and Flask (backend), containing the trained model, scaler, and vectorizer (found in the [application](https://github.com/redwanhuq/campaign-critic/tree/master/application) folder).
+- Jupyter notebooks that illustrate every aspect of building this project with complete documentation. Each notebook can be run to generate the data and content needed for the subsquent notebook.
+   0. [Parsing the Web robots database](https://github.com/redwanhuq/campaign-critic/blob/master/0_parsing_web_robots_database.ipynb)
+   1. [Scraping Kickstarter project pages](https://github.com/redwanhuq/campaign-critic/blob/master/1_scraping_kickstarter_projects.ipynb)
+   2. [Engineering meta features and building a training set](https://github.com/redwanhuq/campaign-critic/blob/master/2_building_training_set.ipynb)
+   3. [Uploading data into PostgreSQL](https://github.com/redwanhuq/campaign-critic/blob/master/3_postgres_uploader.ipynb)
+   4. [Exploring the meta feature space](https://github.com/redwanhuq/campaign-critic/blob/master/4_exploring_meta_feature_space.ipynb)
+   5. [Training a model](https://github.com/redwanhuq/campaign-critic/blob/master/5_training_models.ipynb)
+   6. [Suggesting how a project can be improved](https://github.com/redwanhuq/campaign-critic/blob/master/6_building_suggestions_graph.ipynb)
+- Jupyter notebooks used to prototype (found in the [prototyping](https://github.com/redwanhuq/campaign-critic/tree/master/prototyping) folder and fully documented) the following:
+   1. [Scraping and extracting content from a Kickstarter project page](https://github.com/redwanhuq/campaign-critic/blob/master/prototyping/prototyping-scraping_and_parsing.ipynb)
+   2. [Engineering meta features for a Kickstarter project](https://github.com/redwanhuq/campaign-critic/blob/master/prototyping/prototyping-feature_engineering.ipynb)
+   3. [Developing a machine learning strategy](https://github.com/redwanhuq/campaign-critic/blob/master/prototyping/prototyping-machine_learning.ipynb)
+- Web app based on Bootstrap (front-end) and Flask (back-end), containing the trained model, scaler, and vectorizer (found in the [application](https://github.com/redwanhuq/campaign-critic/tree/master/application) folder).
+- Two Python modules used by the Jupyter notebooks in this repo
+   1. `feature_engineering.py` contains all functions utilized to engineer meta features
+   2. `prediction_results.py` contains all functions utilized to construct the suggestions bar graph
