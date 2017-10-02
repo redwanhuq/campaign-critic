@@ -1,6 +1,6 @@
 # CampaignCritic
 ## What is CampaignCritic?
-A [web app](http://campaigncritic.com/) that helps Kickstarter creators increase their chances of reaching their campaign's funding goal by analyzing the project description, its structure and content.
+A [web app](http://campaigncritic.com/) that helps Kickstarter creators increase the chances of reaching their campaign's funding goal by analyzing the project description, its structure and content, using data science.
 
 ## How do you use CampaignCritic?
 If you've recently launched a Kickstarter, add the URL to your project in the text box in the landing page. If you're still drafting your campaign, the preview URL that Kickstarter generates will work just fine. After you submit your project link, you'll receive the following insights:
@@ -20,7 +20,7 @@ When you submit a link to your Kickstarter project, CampaignCritic:
 4. Computes weighted scores reflecting how effectively your campaign utilizes 6 structural components that were found to be most predictive of funded projects
 5. Compares your project's scores against the top 5% of projects from the past five years
 
-CampaignCritic is only relevant for Kickstarters in the USA and doesn't take into account a project's aesthetics, feasiblility, usefulness, market demand or media buzz—just some aspects of a project's description that are relatively easy for creators to tweak. The model's performance, as measured by precision, is 0.71 +/- 0.01. For those still curious about how I built CampaignCritic, check out these [slides](https://docs.google.com/presentation/d/e/2PACX-1vQtciH4cJu_f81dpL2XCjvI-39WRlAomIqf2dfXUNlgI1wGre2Qj_e-tBWVR5GShQeFeFQL_idfM4Nj/pub?start=false&loop=false&delayms=3000).
+**Note:** CampaignCritic is only relevant for Kickstarters in the USA and doesn't take into account a project's aesthetics, feasiblility, usefulness, market demand or media buzz—just some aspects of a project's description that are relatively easy for creators to tweak. The model's performance, as measured by precision, is 0.71 +/- 0.01. For those still curious about how I built CampaignCritic, check out these [slides](https://docs.google.com/presentation/d/e/2PACX-1vQtciH4cJu_f81dpL2XCjvI-39WRlAomIqf2dfXUNlgI1wGre2Qj_e-tBWVR5GShQeFeFQL_idfM4Nj/pub?start=false&loop=false&delayms=3000).
 
 ## Why did I build CampaignCritic?
 - I want to help Kickstarter creators maximize their chances of reaching their funding goal. Too many innovative projects are crippled by a lackluster project description. Not everyone is a seasoned campaign designer.
@@ -42,10 +42,10 @@ CampaignCritic is only relevant for Kickstarters in the USA and doesn't take int
    3. [Developing a machine learning strategy](https://github.com/redwanhuq/campaign-critic/blob/master/prototyping/prototyping-machine_learning.ipynb)
 - Web app based on Bootstrap (front-end) and Flask (back-end), containing the trained model, scaler, and $n$-gram vectorizer (found in the [application](https://github.com/redwanhuq/campaign-critic/tree/master/application) folder).
 - Two Python modules used by the Jupyter notebooks in this repo:
-   1. `feature_engineering.py` contains all functions used for engineering meta features
+   1. `feature_engineering.py` contains all functions used for engineering structural (meta) features
    2. `prediction_results.py` contains all functions used for constructing the suggestions bar graph
 
 ## Summary and what's next
-I designed CampaignCritic to help Kickstarter creators struggling with writing a project description, as well as creators who just want to maximize their chances. However, my hope is that by using CampaignCritic, creators will develop better project descriptions that are more convincing, thus enabling a richer crowdfunding scene and perhaps, more frequent innovations from everyday folks. 
+I designed CampaignCritic to help Kickstarter creators struggling with writing a project description, as well as creators who just want to maximize their chances. However, my hope is that by using CampaignCritic, creators will develop better project descriptions that are more convincing, thus enabling a richer crowdfunding scene and perhaps more frequent innovations from everyday folks. 
 
 Given more time, I'd love to incorporate the funding goal, the pledge structure, image quality and text content inside images in the feature space to improve the model's performance and provide additional knobs that creator's could realistically turn to tweak their project's description and further increase their chances.
