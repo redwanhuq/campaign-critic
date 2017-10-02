@@ -2,8 +2,6 @@
 ## What is CampaignCritic?
 A [web app](http://campaigncritic.com/) that helps Kickstarter creators increase their chances of reaching their campaign's funding goal by analyzing the project description, its structure and content.
 
-![Landing page](landing_page.PNG)
-
 ## How do you use CampaignCritic?
 If you've recently launched a Kickstarter, add the URL to your project in the text box in the landing page. If you're still drafting your campaign, the preview URL that Kickstarter generates will work just fine. After you submit your project link, you'll receive the following insights:
 - Probability that your project will reach its funding goal
@@ -11,6 +9,8 @@ If you've recently launched a Kickstarter, add the URL to your project in the te
 - How to improve your chances by adding specific language or topics that are highly predictive of successfully funded projects
 
 I hope you enjoy using CampaignCritic as much as I enjoyed building it!
+
+![Landing page](landing_page.PNG)
 
 ## How does CampaignCritic work?
 When you submit a link to your Kickstarter project, CampaignCritic:
